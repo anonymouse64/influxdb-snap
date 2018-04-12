@@ -23,6 +23,7 @@ parts:
     after: [go]
     source: https://github.com/influxdata/influxdb.git
     source-tag: v1.5.1
+    source-depth: 1
     plugin: python
     install: |
       echo $(pwd)
