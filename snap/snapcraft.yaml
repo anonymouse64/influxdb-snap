@@ -33,7 +33,7 @@ parts:
       export GOPATH=$(readlink -f $(pwd)/../go)
       export GOIMPORTPATH=$GOPATH/src/github.com/influxdata/influxdb/
       mkdir -p $GOIMPORTPATH
-      cp -r . $GOIMPORTPATH
+      cp -r ./* $GOIMPORTPATH
       cd $GOIMPORTPATH
       python build.py --outdir $SNAPCRAFT_PART_INSTALL/bin
       mkdir -p $SNAPCRAFT_PART_INSTALL/conf
