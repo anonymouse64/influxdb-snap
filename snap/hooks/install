@@ -2,7 +2,7 @@
 set -e
 
 # ensure the conf directory exists
-if [ ! -d $SNAP_DATA/conf]; then
+if [ ! -d $SNAP_DATA/conf ]; then
 	mkdir -p $SNAP_DATA/conf
 fi
 
