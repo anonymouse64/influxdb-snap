@@ -35,6 +35,8 @@ parts:
       cp -r . $GOIMPORTPATH
       cd $GOIMPORTPATH
       python build.py --outdir $SNAPCRAFT_PART_INSTALL/bin
+      mkdir -p $SNAPCRAFT_PART_INSTALL/conf
+      cp etc/config.sample.toml $SNAPCRAFT_PART_INSTALL/conf/influxdb.conf
     stage-packages:
       - libdb5.3-dev
     build-packages: 
