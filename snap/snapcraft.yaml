@@ -25,11 +25,7 @@ parts:
     source-tag: v1.5.1
     plugin: python
     install: |
-      mv build/influx $SNAPCRAFT_PART_INSTALL/bin/influx
-      mv build/influx_inspect $SNAPCRAFT_PART_INSTALL/bin/influx_inspect
-      mv build/influx_stress $SNAPCRAFT_PART_INSTALL/bin/influx_stress
-      mv build/influx_tsm $SNAPCRAFT_PART_INSTALL/bin/influx_tsm
-      mv build/influxd $SNAPCRAFT_PART_INSTALL/bin/influxd
+      echo $(pwd)
     build: |
       env | grep SNAPCRAFT
       export PATH="$SNAPCRAFT_STAGE/bin:$PATH"
@@ -38,7 +34,7 @@ parts:
       mkdir -p $GOIMPORTPATH
       cp -r . $GOIMPORTPATH
       cd $GOIMPORTPATH
-      python build.py
+      python build.py --outdir $SNAPCRAFT_PART_INSTALL/bin
     stage-packages:
       - libdb5.3-dev
     build-packages: 
