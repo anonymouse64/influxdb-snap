@@ -26,9 +26,8 @@ parts:
     source-depth: 1
     plugin: python
     install: |
-      echo $(pwd)
+      #
     build: |
-      env | grep SNAPCRAFT
       export PATH="$SNAPCRAFT_STAGE/bin:$PATH"
       export GOPATH=$(readlink -f $(pwd)/../go)
       export GOIMPORTPATH=$GOPATH/src/github.com/influxdata/influxdb/
