@@ -1,5 +1,6 @@
 name: influxdb-ijohnson
-version: '1.5.1'
+version: '1.7.5'
+base: core18
 summary: An Open-Source Time Series Database
 description: |
   InfluxDB is an open source time series database with no external dependencies.
@@ -16,23 +17,19 @@ parts:
       '*.sh': bin/
     prime:
       - bin
-  go:
-    source-tag: go1.9.5
-    source-depth: 1
   influxdb:
-    after: [go]
     source: https://github.com/influxdata/influxdb.git
-    source-tag: v1.5.1
+    source-tag: v1.7.5
+    build-snaps: ["go"]
     source-depth: 1
     plugin: python
-    install: |
-      #
-    build: |
+    override-build: |
       export PATH="$SNAPCRAFT_STAGE/bin:$PATH"
       export GOPATH=$(readlink -f $(pwd)/../go)
       export GOIMPORTPATH=$GOPATH/src/github.com/influxdata/influxdb/
       mkdir -p $GOIMPORTPATH
       cp -r ./* $GOIMPORTPATH
+      cp -r .git $GOIMPORTPATH
       cd $GOIMPORTPATH
       python build.py --outdir $SNAPCRAFT_PART_INSTALL/bin
       mkdir -p $SNAPCRAFT_PART_INSTALL/conf
@@ -40,7 +37,6 @@ parts:
     stage-packages:
       - libdb5.3-dev
     build-packages: 
-      - python-software-properties
       - software-properties-common
       - wget
       - git
