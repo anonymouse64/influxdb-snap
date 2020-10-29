@@ -2,9 +2,9 @@
 set -e
 
 # ensure the conf directory exists
-if [ ! -d $SNAP_DATA/conf ]; then
-	mkdir -p $SNAP_DATA/conf
+if [ ! -d "$SNAP_DATA/conf" ]; then
+	mkdir -p "$SNAP_DATA/conf"
 fi
 
 # copy the default config file 
-cp $SNAP/conf/influxdb.conf $SNAP_DATA/conf/influxdb.conf
+cp "$SNAP/conf/influxdb.conf" "$SNAP_DATA/conf/influxdb.conf"
