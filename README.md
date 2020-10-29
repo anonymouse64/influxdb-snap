@@ -1,3 +1,3 @@
 ### InfluxDB Snap
 
-[![Snap Status](https://build.snapcraft.io/badge/anonymouse64/influxdb-snap.svg)](https://build.snapcraft.io/user/anonymouse64/influxdb-snap)
+[![influxdb-ijohnson](https://snapcraft.io/influxdb-ijohnson/badge.svg)](https://snapcraft.io/influxdb-ijohnson)
