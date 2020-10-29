@@ -9,6 +9,8 @@ description: |
 grade: stable
 confinement: strict
 
+license: MIT
+
 parts:
   influxdb:
     source: https://github.com/influxdata/influxdb.git
