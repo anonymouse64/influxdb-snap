@@ -1,5 +1,5 @@
 name: influxdb-ijohnson
-version: '1.7.5'
+version: "1.7.5"
 base: core18
 summary: An Open-Source Time Series Database
 description: |
@@ -10,13 +10,6 @@ grade: stable
 confinement: strict
 
 parts:
-  scripts:
-    source: scripts
-    plugin: dump
-    organize:
-      '*.sh': bin/
-    prime:
-      - bin
   influxdb:
     source: https://github.com/influxdata/influxdb.git
     source-tag: v1.7.5
@@ -36,7 +29,7 @@ parts:
       cp etc/config.sample.toml $SNAPCRAFT_PART_INSTALL/conf/influxdb.conf
     stage-packages:
       - libdb5.3-dev
-    build-packages: 
+    build-packages:
       - software-properties-common
       - wget
       - git
@@ -55,14 +48,17 @@ parts:
       - xmlto
       - docbook-xsl
 
-
 apps:
   influx:
     command: bin/influx
     plugs:
       - network
   influxd:
-    command: bin/runinfluxd.sh
+    environment:
+      INFLUXDB_META_DIR: $SNAP_DATA/meta
+      INFLUXDB_DATA_DIR: $SNAP_DATA/data
+      INFLUXDB_DATA_WAL_DIR: $SNAP_DATA/wal
+    command: bin/influxd -config $SNAP_DATA/conf/influxdb.conf
     daemon: simple
     restart-condition: always
     plugs:
