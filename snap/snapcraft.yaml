@@ -1,6 +1,6 @@
 name: influxdb-ijohnson
-version: "1.7.5"
-base: core18
+adopt-info: influxdb
+base: core20
 summary: An Open-Source Time Series Database
 description: |
   InfluxDB is an open source time series database with no external dependencies.
@@ -12,43 +12,62 @@ confinement: strict
 license: MIT
 
 parts:
-  influxdb:
-    source: https://github.com/influxdata/influxdb.git
-    source-tag: v1.7.5
-    build-snaps: ["go"]
-    source-depth: 1
-    plugin: python
+  rust:
+    plugin: nil
+    build-snaps:
+      - rustup
     override-build: |
-      export PATH="$SNAPCRAFT_STAGE/bin:$PATH"
-      export GOPATH=$(readlink -f $(pwd)/../go)
-      export GOIMPORTPATH=$GOPATH/src/github.com/influxdata/influxdb/
-      mkdir -p $GOIMPORTPATH
-      cp -r ./* $GOIMPORTPATH
-      cp -r .git $GOIMPORTPATH
-      cd $GOIMPORTPATH
-      python build.py --outdir $SNAPCRAFT_PART_INSTALL/bin
+      rustup install stable
+
+  influxdb:
+    after:
+      - rust
+    source: https://github.com/influxdata/influxdb.git
+    source-tag: v1.8.3
+    build-snaps:
+      - go
+    plugin: make
+    build-environment:
+      # this seems ineffective?
+      - NODE_OPTIONS: --max_old_space_size=4096
+    override-pull: |
+      snapcraftctl pull
+      # TODO: git gets confused since there is a tag _and_ a branch called 
+      # 1.8.3 and so somehow this ends up setting the version to 2.0.0... which
+      # is obviously wrong, so for now just hard-code the version
+      snapcraftctl set-version v1.8.3
+      # snapcraftctl set-version $(git describe --tags)
+    override-build: |
+      # yarnpkg is really "yarn", but I don't know how to make the project use 
+      # "yarnpkg" so instead just make a symlink to the debian package binary
+      if ! [ -L /usr/local/bin/yarn ]; then
+        ln -s $(which yarnpkg) /usr/local/bin/yarn
+      fi
+
+      # main build
+      cd $SNAPCRAFT_PART_BUILD
+      make
+
+      # install the binaries
+      mkdir -p $SNAPCRAFT_PART_INSTALL/bin
+      cp $SNAPCRAFT_PART_BUILD/bin/linux/* $SNAPCRAFT_PART_INSTALL/bin
+
+      # this is now an empty file by default?
       mkdir -p $SNAPCRAFT_PART_INSTALL/conf
-      cp etc/config.sample.toml $SNAPCRAFT_PART_INSTALL/conf/influxdb.conf
-    stage-packages:
-      - libdb5.3-dev
+      touch $SNAPCRAFT_PART_INSTALL/conf/influxdb.conf
+    organize:
+      bin/linux: bin/
     build-packages:
-      - software-properties-common
-      - wget
       - git
-      - mercurial
       - make
-      - ruby
-      - ruby-dev
-      - autoconf
-      - libtool
+      - libclang1-10
       - build-essential
-      - rpm
-      - zip
-      - python
-      - python-boto
-      - asciidoc
-      - xmlto
-      - docbook-xsl
+      - pkg-config
+      - bzr
+      - protobuf-compiler
+      - libprotobuf-dev
+      - yarnpkg
+      - llvm
 
 apps:
   influx:
@@ -60,7 +79,10 @@ apps:
       INFLUXDB_META_DIR: $SNAP_DATA/meta
       INFLUXDB_DATA_DIR: $SNAP_DATA/data
       INFLUXDB_DATA_WAL_DIR: $SNAP_DATA/wal
-    command: bin/influxd -config $SNAP_DATA/conf/influxdb.conf
+      INFLUXDB_CONFIG_PATH: $SNAP_DATA/conf/influxdb.conf
+      INFLUXD_BOLT_PATH: $SNAP_DATA/influxdbv2/influxd.bolt
+      INFLUXD_ENGINE_PATH: $SNAP_DATA/influxdbv2/engine
+    command: bin/influxd
     daemon: simple
     restart-condition: always
     plugs:
